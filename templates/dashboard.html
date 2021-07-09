@@ -1,0 +1,380 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Geo Agency</title>
+      <!-- Required meta tags -->
+      <!-- semantic UI -->
+      <link rel="stylesheet" type='text/css' href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.14/semantic.min.css">
+      <!--Chart js-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" integrity="sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E=" crossorigin="anonymous" />
+      <!-- jQuery -->
+      <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+  <!-- Custom fonts for this template-->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="{% static 'css/sb-admin-2.min.css' %} " rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'dashboard' %}">
+        <div class="sidebar-brand-icon rotate-n-15">
+          <i class="fas fa-address-card"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">Geo-Agency</div>
+      </a>
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+
+      <p class="text-center text-white font-weight-bold">Welcome {{request.user.username}}!</p>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'dashboard' %}">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+          <span>Dashboard</span></a>
+      </li>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+      
+      <!-- Nav Item - Companies -->
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'leads:lead-list' %}">
+          <i class="fas fa-fw fa-users"></i>
+          <span>Leads</span></a>
+      </li>
+
+      <!-- Nav Item - Contact -->
+      {% if request.user.is_organisor %}
+      <li class="nav-item">
+        <a class="nav-link" href="#">
+          <i class="fas fa-fw fa-user-circle"></i>
+          <span>Agents</span></a>
+      </li>
+      {% endif %}
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+      <!-- Nav Item - Profile -->
+      <li class="nav-item">
+        <a class="nav-link" href="#">
+          <i class="fas fa-fw fa-map-marker"></i>
+          <span>Maps</span></a>
+      </li>
+
+      <!-- Nav Item - Logout -->
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'logout' %}">
+          <i class="fas fa-fw fa-sign-out-alt"></i>
+          <span>Logout</span></a>
+      </li>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider d-none d-md-block">
+  
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+                        <!-- Topbar -->
+                        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                          <!-- Sidebar Toggle (Topbar) -->
+                          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                              <i class="fa fa-bars"></i>
+                          </button>
+      
+
+      
+                          <!-- Topbar Navbar -->
+                          <ul class="navbar-nav ml-auto">
+      
+                            
+                              <div class="topbar-divider d-none d-sm-block">
+                                
+                              </div>
+                              <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                          <a class="nav-link dropdown-toggle" id="userDropdown" role="button"
+                              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <span class="mr-2 dd-none d-lg-inline text-gray-600 small">{{request.user.first_name}} {{request.user.last_name}}</span>
+                              <img class="img-profile rounded-circle"
+                                  src="{% static 'img/undraw_profile.svg' %} ">
+                          </a>
+                      </li>
+      
+                              
+      
+                          </ul>
+      
+                      </nav>
+                      <!-- End of Topbar -->
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
+            <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+          </div>          
+
+          <!-- Main Content Here -->
+          <div class="row">
+
+            
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      <div  class="text-xs font-weight-bold text-primary text-uppercase mb-1"><a href="{% url 'leads:lead-list' %}"> Leads </a></div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">Leads: {{ leads_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+
+            <!-- Pending Requests Card Example -->
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      {% if request.user.is_organisor %}
+                      <div class="text-xs font-weight-bold text-warning text-uppercase mb-1"><a href="{% url 'leads:unassigend-leads' %}"> Unassigned Leads </a> </div>
+                      {% endif %}
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">Unassigned Leads : {{ unassigned_lead_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-comments fa-2x text-gray-300"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+              <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                  <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                      {% if request.user.is_organisor %}
+                      <div  class="text-xs font-weight-bold text-primary text-uppercase mb-1"><a href="{% url 'leads:lead-list' %}">  Unassigned Lead </a></div>
+                      {% endif %}
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">Uncategorized Leads : {{ uncategorized_lead_count }}</div>
+                    </div>
+                    <div class="col-auto">
+                      <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                    </div>
+                  </div> 
+                </div>
+              </div>
+            </div>
+            {% if request.user.is_agent %}
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                  <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                      <div class="col mr-2">
+                        <div  class="text-xs font-weight-bold text-primary text-uppercase mb-1"><a href="{% url 'agents:task-view' %}">  Tasks </a></div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">Tasks : {{ task_count }}</div>
+                      </div>
+                      <div class="col-auto">
+                        <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                      </div>
+                    </div> 
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+              {% if request.user.is_organisor %}
+              <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tasks Progress
+                                </div>
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col-auto">
+                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{progress}}%</div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="progress progress-sm mr-2">
+                                            <div class="progress-bar bg-info" role="progressbar"
+                                                style="width: {{progress}}%" aria-valuenow="50" aria-valuemin="0"
+                                                aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            {% endif %}
+          </div>
+
+
+        <hr class="new2">
+        <hr class="new2">
+        <div>
+        {% block scripts %}
+
+<script>
+    $(document).ready(function(){
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+        labels: ['Unconverted', 'Converted','Contacted'],
+        datasets: [{
+            label: '# of Votes',
+            data: ['{{ unconverted }}', '{{ unconverted }}','{{ contacted }}'],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.5)',
+                'rgba(54, 162, 235, 0.5)',
+                'rgba(255, 206, 86, 0.5)',
+                'rgba(75, 192, 192, 0.5)',
+                'rgba(153, 102, 255, 0.5)',
+                'rgba(255, 159, 64, 0.5)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 0.5)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+    });
+</script>
+
+
+<script>
+  $(document).ready(function(){
+      var ctx = document.getElementById('Chart').getContext('2d');
+      var myChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+      labels: ["Smouha","Lauran"],
+      datasets: [{
+          label: '# of Votes',
+          data: ['{{ smouha }}', '{{ lauran }}'],
+          backgroundColor: [
+              'rgba(155, 0, 0, 0.5)',
+              'rgba(54, 162, 235, 0.5)',
+              'rgba(255, 206, 86, 0.5)',
+              'rgba(75, 192, 192, 0.5)',
+              'rgba(153, 102, 255, 0.5)',
+              'rgba(255, 159, 64, 0.5)'
+          ],
+          borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)'
+          ],
+          borderWidth: 0
+      }]
+  },
+  options: {
+      scales: {
+          y: {
+              beginAtZero: true
+          }
+      }
+  }
+});
+
+  });
+</script>
+  
+{% endblock scripts %}
+
+
+<div class="row my-2">
+  <div class="col-md-6 py-1">
+      <div class="card">
+          <div class="card-body">
+              <canvas id="Chart"></canvas>
+          </div>
+      </div>
+  </div>
+  <div class="col-md-6 py-1">
+      <div class="card">
+          <div class="card-body">
+              <canvas id="myChart"></canvas>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+      
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  
+</body>
+
+</html>

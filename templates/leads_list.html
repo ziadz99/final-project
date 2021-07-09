@@ -1,0 +1,238 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Geo Agency</title>
+      <!-- Required meta tags -->
+      <!-- semantic UI -->
+      <link rel="stylesheet" type='text/css' href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.14/semantic.min.css">
+      <!--Chart js-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" integrity="sha256-Uv9BNBucvCPipKQ2NS9wYpJmi8DTOEfTA/nH2aoJALw=" crossorigin="anonymous"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" integrity="sha256-aa0xaJgmK/X74WM224KMQeNQC2xYKwlAt08oZqjeF0E=" crossorigin="anonymous" />
+      <!-- jQuery -->
+      <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+  <!-- Custom fonts for this template-->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="{% static 'css/sb-admin-2.min.css' %} " rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'dashboard' %}">
+        <div class="sidebar-brand-icon rotate-n-15">
+          <i class="fas fa-address-card"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">Geo-Agency</div>
+      </a>
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+
+      <p class="text-center text-white font-weight-bold">Welcome {{request.user.username}}!</p>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'dashboard' %}">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+          <span>Dashboard</span></a>
+      </li>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+      
+      <!-- Nav Item - Companies -->
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'leads:lead-list' %}">
+          <i class="fas fa-fw fa-users"></i>
+          <span>Leads</span></a>
+      </li>
+
+      <!-- Nav Item - Contact -->
+      {% if request.user.is_organisor %}
+      <li class="nav-item">
+        <a class="nav-link" href="#">
+          <i class="fas fa-fw fa-user-circle"></i>
+          <span>Agents</span></a>
+      </li>
+      {% endif %}
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+      <!-- Nav Item - Profile -->
+      <li class="nav-item">
+        <a class="nav-link" href="#">
+          <i class="fas fa-fw fa-map-marker"></i>
+          <span>Maps</span></a>
+      </li>
+
+      <!-- Nav Item - Logout -->
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'logout' %}">
+          <i class="fas fa-fw fa-sign-out-alt"></i>
+          <span>Logout</span></a>
+      </li>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider d-none d-md-block">
+  
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+                        <!-- Topbar -->
+                        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                          <!-- Sidebar Toggle (Topbar) -->
+                          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                              <i class="fa fa-bars"></i>
+                          </button>
+      
+
+      
+                          <!-- Topbar Navbar -->
+                          <ul class="navbar-nav ml-auto">
+      
+                            
+                              <div class="topbar-divider d-none d-sm-block">
+                                
+                              </div>
+                              <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{request.user.first_name}} {{request.user.last_name}}</span>
+                              <img class="img-profile rounded-circle"
+                                  src="{% static 'img/undraw_profile.svg' %} ">
+                          </a>
+                      </li>
+      
+                              
+      
+                          </ul>
+      
+                      </nav>
+                      <!-- End of Topbar -->
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4 mt-4">
+            <h1 class="h3 mb-0 text-gray-800">Here are all your leads</h1>
+          </div>          
+
+          <!-- Main Content Here -->
+                <div class="container-fluid">
+
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">  
+                            <h6 class="h3 mb-0 text-gray-800">
+                                Leads
+                                {% if request.user.is_organisor %}
+                                <div class='float-sm-right'> 
+                                    <a class="btn btn-primary" href="{% url 'leads:lead-create' %}" role="button">Add New Lead</a>
+                                    <a class="btn btn-primary" href="{% url 'leads:unassigend-leads' %}" role="button">Unassigned Leads</a>
+                                </div>
+                                {% endif %}
+                            </h6>
+
+
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive-lg">
+                                <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
+
+                                <table class="table table-bordered" id="dataTable" width="90%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Age</th>
+                                            <th>Organization</th>
+                                            <th>Category</th>
+                                            <th>Email</th>
+                                            <th>Location</th>
+                                            <th>Lead Status</th>
+                                            <th>Spendings</th>                                                
+                                            
+                                            
+                                            
+            
+                                        </tr>
+                                    </thead>
+                                
+                                    <tbody>
+                                    {% for lead in object_list %}
+                                        <tr>
+                                            <td><a href="{% url 'leads:lead-detail' lead.pk %}" >{{ lead.first_name }} {{ lead.last_name }} </a></td>
+                                            <td>{{ lead.age }}</td>
+                                            <td>{{ lead.organisation }}</td>
+                                            <td>{{ lead.category }}</td>
+                                            <td>{{ lead.email }}</td>
+                                            <td>{{ lead.location }}</td>
+                                            <td>{{ lead.Lead_status }}</td>
+                                            <td>{{ lead.spendings }}</td>
+                                        </tr>
+                                        {% endfor %}
+            
+                                       
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+            
+                </div>
+
+
+        <hr class="new2">
+        <div>
+
+
+
+
+
+        </div>
+        <!-- /.container-fluid -->
+
+      </div>
+      <!-- End of Main Content -->
+
+      
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  
+</body>
+
+</html>

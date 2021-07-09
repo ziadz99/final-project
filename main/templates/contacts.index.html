@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    {% load getAttribute %}
+    <div class="container">
+        <div class="row my-3">
+            <div class="col">
+                <table id="report-table" class="table bordered table-hover table-responsive-sm">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Company</th>
+                        <th>Type</th>
+                        <th>Service Type</th>
+                        <th>Rating</th>
+                        <th>situation</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for Contact in object_list %}
+                        <tr>
+                            <td>{{ Contact.id }}</td>
+                            <td>
+                                <a type="button" data-toggle="modal"
+                                   data-target="#exampleModal{{ Contact.pk }}">
+                                    {{ Contact.company_name }}
+                                </a>
+                            </td>
+                            <td>{{ Contact.company_type }}</td>
+                            <td>{{ Contact.service_type }}</td>
+                            <td>{{ Contact.rating }}/5</td>
+                            <td>{{ Contact.situation }}</td>
+                            <td>
+                                <a href="/map?lnk_lat={{ Contact.latitude }}&lnk_lon={{ Contact.longitude }}"
+                                   class="btn btn-success btn-sm">Map</a>
+                                <a href="/admin/main/contact/{{ Contact.pk }}/change/" class="btn btn-warning btn-sm">Edit</a>
+                            </td>
+                        </tr>
+                        <div class="modal fade" id="exampleModal{{ Contact.pk }}" tabindex="-1" role="dialog"
+                             aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">{{ Contact.company_name }}</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        {% for infoField in ModalFields %}
+                                            <div class="row">
+                                                <div class="col-4">{{ infoField }}</div>
+                                                <div class="col-8 text-center">{{ Contact|getattribute:infoField }}</div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#report-table").DataTable();
+        });
+
+    </script>
+
+{% endblock content %}

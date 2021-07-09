@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+{% block content %}
+    {% load getAttribute %}
+    <div id='map' width="100%" style='height:90%'></div>
+    <script>
+        mapboxgl.accessToken = "pk.eyJ1IjoiYmltYXJpc3RhciIsImEiOiJjazl3M25jNXAwMjA0M2V0ZTFjdDIwdjEzIn0.w77Yx8nGXJoy48bRrNXSQg";
+        mapboxgl.setRTLTextPlugin(
+            'https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js',
+            null,
+            true // Lazy load the plugin
+        );
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: "mapbox://styles/mapbox/streets-v11",
+            zoom: ({{ user_lat }}) ? 12 : 3,
+            minZoom: 2,
+            center: [({{ user_lon }}) ? {{ user_lon }} : 17.031645, ({{ user_lat }}) ? {{ user_lat }} : 41.106715],
+        });
+        map.addControl(
+            new MapboxGeocoder({
+                accessToken: mapboxgl.accessToken,
+                localGeocoder: forwardGeocoder,
+                zoom: 15,
+                placeholder: 'Search',
+                marker: {
+                    color: 'orange',
+                    element: '',
+
+                },
+                mapboxgl: mapboxgl
+            })
+        );
+        map.addControl(new mapboxgl.NavigationControl());
+        map.addControl(
+            new mapboxgl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true
+                },
+                trackUserLocation: true
+            })
+        );
+        map.addControl(new mapboxgl.FullscreenControl());
+
+        var mappingData = {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': [
+                    {% for feature in object_list %}
+                        {% if not feature.longitude == 0 %}
+                            {
+                                'type': 'Feature',
+                                'properties': {
+                                    name: '{{ feature.company_name }}',
+                                    description: '<h3><a>{{ feature.company_name }}</a></h3>' +
+                                        '<div class="row">' +
+                                        {% for infoField in ModalFields %}
+                                            '<div class="col-4">{{ infoField }}</div>'+
+                                            '<div class="col-8 text-center">{{ feature|getattribute:infoField }}</div>'+
+                                        {% endfor %}
+                                        '</div>'
+
+                                },
+                                'geometry': {
+                                    'type': 'Point',
+                                    'coordinates': [
+                                        {{ feature.longitude }},
+                                        {{ feature.latitude }}
+                                    ]
+                                }
+                            },
+                        {% endif %}
+                    {% endfor %}
+
+                ]
+            }
+        }
+        var ClientsMappingData = {
+            'type': 'geojson',
+            'data': {
+                'type': 'FeatureCollection',
+                'features': [
+                    {% for costumerFeature in costumers_list %}
+                        {% if not costumerFeature.longitude == 0 %}
+                            {
+                                'type': 'Feature',
+                                'properties': {
+                                    name: '{{ costumerFeature.name }}',
+                                    description: '<h3><a>{{ costumerFeature.name }}</a></h3>' +
+                                        '<div class="row">' +
+                                        {% for infoField in costumers_modal_fields %}
+                                            '<div class="col-4">{{ infoField }}</div>'+
+                                            '<div class="col-8 text-center">{{ costumerFeature|getattribute:infoField }}</div>'
+                                            +
+                                        {% endfor %}
+                                        '</div>'
+                                },
+                                'geometry': {
+                                    'type': 'Point',
+                                    'coordinates': [
+                                        {{ costumerFeature.longitude }},
+                                        {{ costumerFeature.latitude }}
+                                    ]
+                                }
+                            },
+                        {% endif %}
+                    {% endfor %}
+
+                ]
+            }
+        }
+        map.on('load', function () {
+// Add a GeoJSON source with 3 points.
+            map.addSource('points', mappingData);
+            map.addSource('costumer_points', ClientsMappingData);
+// Add a circle layer
+            map.addLayer({
+                'id': 'circle',
+                'type': 'circle',
+                'source': 'points',
+                'paint': {
+                    'circle-color': '#880088',
+                    'circle-radius': 8,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#ffffff'
+                }
+            });
+            map.addLayer({
+                'id': 'circle2',
+                'type': 'circle',
+                'source': 'costumer_points',
+                'paint': {
+                    'circle-color': '#1f8b8b',
+                    'circle-radius': 8,
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#ffffff'
+                }
+            });
+
+            map.on('click', 'circle', function (e) {
+                map.flyTo({
+                    center: e.features[0].geometry.coordinates,
+                    zoom: 18,
+                    bearing: 0,
+                    curve: 1, // change the speed at which it zooms out
+                });
+            });
+            map.on('click', 'circle2', function (e) {
+                map.flyTo({
+                    center: e.features[0].geometry.coordinates,
+                    zoom: 18,
+                    bearing: 0,
+                    curve: 1, // change the speed at which it zooms out
+                });
+            });
+
+// Change the cursor to a pointer when the it enters a feature in the 'circle' layer.
+            map.on('mouseenter', 'circle', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+            map.on('mouseenter', 'circle2', function () {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+// Change it back to a pointer when it leaves.
+            map.on('mouseleave', 'circle', function () {
+                map.getCanvas().style.cursor = '';
+            });
+            map.on('mouseleave', 'circle2', function () {
+                map.getCanvas().style.cursor = '';
+            });
+            {% if lnk_lat and lnk_lon %}
+                new mapboxgl.Marker()
+                    .setLngLat([{{ lnk_lon }}, {{ lnk_lat }}])
+                    .addTo(map);
+                map.flyTo({
+                    center: [{{ lnk_lon }}, {{ lnk_lat }}],
+                    zoom: 18,
+                    bearing: 0,
+                    curve: 1, // change the speed at which it zooms out
+                });
+            {% endif %}
+        });
+
+        map.on('click', 'circle', function (e) {
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var description = e.features[0].properties.description;
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+            new mapboxgl.Popup()
+                .setLngLat(coordinates)
+                .setHTML(description)
+                .addTo(map);
+        });
+        map.on('click', 'circle2', function (e) {
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            var description = e.features[0].properties.description;
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+            new mapboxgl.Popup()
+                .setLngLat(coordinates)
+                .setHTML(description)
+                .addTo(map);
+        });
+
+        function forwardGeocoder(query) {
+            var matchingFeatures = [];
+            for (var i = 0; i < mappingData.data.features.length; i++) {
+                var feature = mappingData.data.features[i];
+
+                if (
+                    feature.properties.name
+                        .toLowerCase()
+                        .search(query.toLowerCase()) !== -1
+                ) {
+                    feature['place_name'] = '📱' + feature.properties.name;
+                    feature['center'] = feature.geometry.coordinates;
+                    matchingFeatures.push(feature);
+                }
+            }
+            for (var j = 0; j < ClientsMappingData.data.features.length; j++) {
+                var featurej = ClientsMappingData.data.features[j];
+
+                if (
+                    featurej.properties.name
+                        .toLowerCase()
+                        .search(query.toLowerCase()) !== -1
+                ) {
+                    featurej['place_name'] = '💁' + featurej.properties.name;
+                    featurej['center'] = featurej.geometry.coordinates;
+                    matchingFeatures.push(featurej);
+                }
+            }
+            return matchingFeatures;
+        }
+
+
+    </script>
+
+{% endblock %}
